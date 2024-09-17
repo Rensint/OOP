@@ -1,0 +1,3 @@
+S001, Morning Shift, 08:00, 12:00
+S002, Afternoon Shift, 12:00, 16:00
+S003, Night Shift, 16:00, 20:00
