@@ -1,0 +1,9 @@
+S001,Parker,123 Jalan Ampang 50450 Kuala Lumpur,01123456789,parker@gmail.com
+S002,Staples,456 Persiaran Gurney 10250 George Town Penang,0198765321,staples@gmail.com
+S003,Pilot,789 Jalan Sultan Ismail 50250 Kuala Lumpur,0123567890,pilot@gmail.com
+S004,Deli,321 Lorong Bukit Cina 75000 Melaka,0176543109,deli@gmail.com
+S005,Staedtler,654 Jalan Wong Ah Fook 80000 Johor Bahru Johor,0183456789,staedtler@gmail.com
+S006,Maped,987 Jalan Tunku Abdul Rahman 93100 Kuching Sarawak,0134568901,maped@gmail.com
+S007,Stabilo,159 Jalan Raja Permaisuri Bainun 30250 Ipoh Perak,0165431098,stabilo@gmail.com
+S008,Sharpie,753 Jalan Tun Fuad Stephens 88000 Kota Kinabalu Sabah,01198765432,sharpie@gmail.com
+S009,Faber-Castell,246 Persiaran Kewajipan 47500 Subang Jaya Selangor,0143567890,faber@gmail.com
