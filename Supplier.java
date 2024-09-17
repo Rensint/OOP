@@ -9,15 +9,15 @@ public class Supplier {
     private String supplierContactNum;
     private String supplierEmail;
 
-    // File to store supplier data
+    
     private static final String FILE_NAME = "supplier.txt";
 
-    // Default constructor
+    
     public Supplier() {
         this(" ", " ", " ", " ", " ");
     }
 
-    // Parameterized constructor
+    
     public Supplier(String supplierID, String supplierName, String supplierAddress, String supplierContactNum, String supplierEmail) {
         this.supplierID = supplierID;
         this.supplierName = supplierName;
@@ -26,7 +26,7 @@ public class Supplier {
         this.supplierEmail = supplierEmail;
     }
 
-    // Getters and setters
+  
     public String getSupplierID() {
         return supplierID;
     }
@@ -88,7 +88,7 @@ public class Supplier {
     }
 
     private boolean isValidID(String id) {
-        return id != null && !id.trim().isEmpty() && id.matches("[a-zA-Z0-9]+");
+        return id != null && !id.trim().isEmpty() && id.matches("[S]\\d{3}");
     }
 
     private boolean isValidName(String name) {
@@ -96,8 +96,12 @@ public class Supplier {
     }
 
     private boolean isValidContactNumber(String contactNum) {
-        return contactNum != null && contactNum.matches("\\d{10,11}"); 
-    }
+    	return contactNum != null && contactNum.matches("01\\d{8,9}"); 
+	}
+
+	private boolean isValidAddress(String address) {
+    	return address != null && !address.trim().isEmpty();
+	}
 
     private boolean isValidEmail(String email) {
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$";
@@ -105,12 +109,12 @@ public class Supplier {
     }
 
     public boolean isValid() {
-        return isValidID(this.supplierID) &&
-               isValidName(this.supplierName) &&
-               this.supplierAddress != null &&
-               isValidContactNumber(this.supplierContactNum) &&
-               isValidEmail(this.supplierEmail);
-    }
+    	return isValidID(this.supplierID) &&
+           isValidName(this.supplierName) &&
+           isValidAddress(this.supplierAddress) &&
+           isValidContactNumber(this.supplierContactNum) &&
+           isValidEmail(this.supplierEmail);
+  	}
 
     // Add a new supplier to the file
     public static void addSupplier(Supplier supplier) {
@@ -119,7 +123,7 @@ public class Supplier {
                 writer.write(supplier.getSupplierID() + "," + supplier.getSupplierName() + "," +
                              supplier.getSupplierAddress() + "," + supplier.getSupplierContactNum() + "," +
                              supplier.getSupplierEmail());
-                writer.newLine(); // Add a new line after each supplier
+                writer.newLine();
                 System.out.println("Supplier added successfully.");
             } catch (IOException e) {
                 System.out.println("An error occurred while adding the supplier.");
@@ -134,14 +138,15 @@ public class Supplier {
     public static void readSuppliers() {
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
             String line;
-            System.out.printf("\n%-10s %-10s %-10s %-10s %-10s\n", "ID", "Name", "Address", "Contact", "Email");
+            System.out.printf("\n%-10s %-20s %-60s %-20s %-20s\n", "ID", "Name", "Address", "Contact", "Email");
+            System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------");
             while ((line = reader.readLine()) != null) {
                 if (line.trim().isEmpty()) {
                     continue;
                 }
                 String[] details = line.split(",");
                 if (details.length == 5) {
-                    System.out.printf("%-10s %-10s %-10s %-10s %-10s\n", details[0].trim(), details[1].trim(), details[2].trim(), details[3].trim(), details[4].trim());
+                    System.out.printf("%-10s %-20s %-60s %-20s %-20s\n", details[0].trim(), details[1].trim(), details[2].trim(), details[3].trim(), details[4].trim());
                 } else {
                     System.out.println("Invalid supplier data: " + line);
                 }
@@ -198,7 +203,7 @@ public class Supplier {
                 if (details[0].equals(supplierID)) {
                     deleted = true;
                     System.out.println("Supplier deleted successfully.");
-                    continue;  // Skip this line
+                    continue;  
                 }
                 content.append(line).append("\n");
             }
@@ -231,7 +236,7 @@ public class Supplier {
 
             if (scanner.hasNextInt()) {
                 int choice = scanner.nextInt();
-                scanner.nextLine(); // Consume newline
+                scanner.nextLine();
 
                 switch (choice) {
                     case 1:
@@ -247,13 +252,13 @@ public class Supplier {
                         deleteSupplierUI(scanner);
                         break;
                     case 5:
-                        return; // Back to main menu
+                        return; 
                     default:
                         System.out.println("Invalid choice. Please enter a number between 1 and 5.");
                 }
             } else {
                 System.out.println("Invalid input. Please enter a number.");
-                scanner.next(); // Consume invalid input
+                scanner.next(); 
             }
         }
     }
