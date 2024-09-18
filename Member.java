@@ -4,15 +4,13 @@ public class Member {
     private String memberID;
     private String name;
     private String email;
-    private String passwordHash;
-    private boolean activation;  // Account active or not
+    private boolean activation;  // Account active?
 
-    public Member(String memberID, String name, String email, String passwordHash) {
+    public Member(String memberID, String name, String email) {
         this.memberID = memberID;
         this.name = name;
         this.email = email;
-        this.passwordHash = passwordHash;
-        this.activation = false; // Default inactive
+        this.activation = false; // Default (Inactive)
     }
 
     // Getters
@@ -45,7 +43,7 @@ public class Member {
         this.email = email;
     }
 
-    // Activate the account
+    // Activate account
     public void activateAccount() {
         this.activation = true;
         System.out.println(memberID + ", your account has been activated.");
@@ -53,12 +51,11 @@ public class Member {
 
     // Update profile
     public void updateProfile(String name, String email) {
-        // No activated
         if (!activation) {
             System.out.println("Error: Account is not activated. Please activate your account to update the profile.");
             return;
         }
-        // Validate 
+
         if (name == null || name.isEmpty() || email == null || email.isEmpty()) {
             System.out.println("Error: Name or Email cannot be empty.");
             return;
@@ -71,14 +68,11 @@ public class Member {
 
     // Delete account
     public void deleteAcc() {
-        //Not activated
         if (!activation) {
-            System.out.println("Error: Account is not activated. Please activate your account to delete. ");
+            System.out.println("Error: Account is not activated. Please activate your account to delete it.");
             return;
         }
-    // Activated
-        System.out.println("Account with ID, " + memberID + " has been deleted.");
-        // Here you could add logic to remove the account from a database or list
+        System.out.println("Account with ID " + memberID + " has been deleted.");
     }
 
     public String toString() {
