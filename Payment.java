@@ -40,11 +40,11 @@ public class Payment {
             System.out.println("\tPAYMENT MENU    ");
             System.out.println("-----------------------------\n");
             System.out.println("|---------------------------|");
-            System.out.println("|Select an option.         |");
+            System.out.println("|Select an option.          |");
             System.out.println("|---------------------------|");
             System.out.println("|[1] Make payment           |");
             System.out.println("|[2] View payment record    |");
-            System.out.println("|[7] Exit                   |");
+            System.out.println("|[3] Exit                   |");
             System.out.println("|---------------------------|\n");
             System.out.print("Option: ");
             try {
@@ -58,17 +58,13 @@ public class Payment {
                             System.out.println("Order already paid.");
                             break;
                         }
-                        double totalPrice = calculateTotalPrice(inputOrderID);
-                        if (makePayment(inputOrderID, totalPrice)) {
-                            Transaction transaction = new Transaction(totalPrice);
-                            transaction.saveTransaction();
-                        }
+                        calculateTotalPrice(inputOrderID);
                         break;
                     case 2:
                         readTransactionRecords();
                         break;
-                    case 7:
-                        
+                    case 3:
+                    	System.out.println("Exiting system...");
                         return;
                 }
             } catch (InputMismatchException e) {
@@ -97,7 +93,7 @@ public class Payment {
         return false;
     }
 
-    public double calculateTotalPrice(String inputOrderID) {
+    public boolean calculateTotalPrice(String inputOrderID) {
         double totalPrice = 0.0;
         boolean foundOrder = false;
         Scanner scanner = new Scanner(System.in);
@@ -117,15 +113,22 @@ public class Payment {
                     System.out.println("Product Price: RM" + String.format("%.2f", productPrice));
                     totalPrice += productPrice * orderQuantity;
                     System.out.println("Total Price: RM" + String.format("%.2f", totalPrice));
+                    if (makePayment(inputOrderID, totalPrice)) {
+                    	updateProductQuantity(productID, orderQuantity);
+                        Transaction transaction = new Transaction(totalPrice);
+                   		transaction.saveTransaction();
+                    }
                 }
             }
             if (!foundOrder) {
                 System.out.println("Order ID " + inputOrderID + " not found.");
+                return false;
             }
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
-        return totalPrice;
+        return true;
     }
 
     public double getProductPrice(String productID) {
@@ -207,8 +210,55 @@ public class Payment {
             e.printStackTrace();
         }
     }
+    
+    public void updateProductQuantity(String productID, int quantityBought){
+    	List<String> fileContent = new ArrayList<>();
+    	boolean foundProduct = false;
+			
+    	try(BufferedReader fileReader = new BufferedReader(new FileReader(ORDER_FILE))){
+    		String line;
+    		while ((line = fileReader.readLine()) != null) {
+    			String[] orderDetails = line.split(",");
+    			String orderID = orderDetails[0].trim();
+    			productID = orderDetails[2].trim();
+    			quantityBought = Integer.parseInt(orderDetails[3].trim());
+    		}
+    	} catch(IOException e){
+    		e.printStackTrace();
+    	}
+    		
+    	try (BufferedReader reader = new BufferedReader(new FileReader(PRODUCT_FILE))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("Product ID: " + productID)) {
+                    foundProduct = true;
+                    fileContent.add(line);
+                    fileContent.add(reader.readLine());
+                    fileContent.add(reader.readLine());
+                    fileContent.add(reader.readLine());
+					fileContent.add(reader.readLine());
+                    
+                    String quantityLine = reader.readLine();
+                    int currentQuantity = Integer.parseInt(quantityLine.split(":")[1].trim());
+                    int newQuantity = currentQuantity + quantityBought;
+                    fileContent.add("Quantity: " + newQuantity);
+                    reader.readLine();
+                    fileContent.add("--");
+                } else {
+                    fileContent.add(line);
+                }
+            }
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(PRODUCT_FILE))) {
+                for (String lineContent : fileContent) {
+                    writer.write(lineContent + "\n");
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-    private void readTransactionRecords() {
+	private void readTransactionRecords() {
         try (BufferedReader reader = new BufferedReader(new FileReader("transactions.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -219,3 +269,5 @@ public class Payment {
         }
     }
 }
+
+
