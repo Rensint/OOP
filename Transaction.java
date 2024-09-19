@@ -2,22 +2,19 @@ import java.io.*;
 import java.util.*;
 
 public class Transaction {
-    private int transactionID;
+    private String transactionID;
     private Date transactionDate;
     private double amount;
     
-    private static final String transactionFile = "transactions.txt";
-	
-	public Transaction(){
-	}
-	
+    private static final String TRANSACTION_FILE = "transactions.txt";
+    
     public Transaction(double amount) {
         this.transactionID = generateTransactionID();
-        this.transactionDate = new Date();
+        this.transactionDate = new Date(); 
         this.amount = amount;
-    }
+    }	
 
-    public int getTransactionID() {
+    public String getTransactionID() {
         return transactionID;
     }
 
@@ -28,42 +25,53 @@ public class Transaction {
     public double getAmount() {
         return amount;
     }
-    
-   public int generateTransactionID() {
-        int lastTransactionID = 0;
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(transactionFile))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // Check if the line starts with "Transaction ID"
-                if (line.startsWith("Transaction ID:")) {
-                    String[] transactionDetails = line.split(":");
-                    if (transactionDetails.length > 1) {
-                        String transactionIDStr = transactionDetails[1].trim().split(",")[0];
-                        try {
-                            // Parse and update lastTransactionID
-                            int transactionID = Integer.parseInt(transactionIDStr);
-                            lastTransactionID = transactionID;
-                        } catch (NumberFormatException e) {
-                            System.out.println("Skipping invalid transaction ID: " + transactionIDStr);
+	public String generateTransactionID() {
+    int highestID = 0; 
+
+    try (BufferedReader reader = new BufferedReader(new FileReader(TRANSACTION_FILE))) {
+        String line;
+        while ((line = reader.readLine()) != null) {
+            
+            if (line.startsWith("Transaction ID:")) {
+                
+                String[] transactionDetails = line.split(",");
+                for (String detail : transactionDetails) {
+                    if (detail.trim().startsWith("Transaction ID:")) {
+                        String id = detail.split(":")[1].trim();
+                       
+                        if (id.length() > 1 && id.startsWith("T")) {
+                            try {
+                                int num = Integer.parseInt(id.substring(1)); // Remove 'T'
+                                if (num > highestID) {
+                                    highestID = num;
+                                }
+                            } catch (NumberFormatException e) {
+                                
+                            }
                         }
                     }
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-
-        // Increment the last transaction ID by 1
-        return lastTransactionID + 1;
+    } catch (IOException e) {
+        e.printStackTrace();
     }
 
+    highestID++; 
+
+    
+    return String.format("T%03d", highestID);
+}
+
+
+
+
     public void saveTransaction() {
-    	generateTransactionID();
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(transactionFile, true))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(TRANSACTION_FILE, true))) {
             writer.write("Transaction ID: " + getTransactionID() + ", ");
             writer.write("Transaction Date: " + getTransactionDate() + ", ");
-            writer.write("Amount: RM" + String.format("%.2f", amount) + ", ");
+            writer.write("Amount: RM" + String.format("%.2f", amount) + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
