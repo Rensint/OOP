@@ -6,6 +6,7 @@ public class Payment {
     private String paymentMethod;
     private static final String PRODUCT_FILE = "products.txt";
     private static final String ORDER_FILE = "orderSupplier.txt";
+    private static final String BALANCE_FILE = "balance.txt";
 
     public Payment() {
     }
@@ -107,14 +108,16 @@ public class Payment {
                     String productID = orderDetails[2].trim();
                     int orderQuantity = Integer.parseInt(orderDetails[3].trim());
                     double productPrice = getProductPrice(productID);
-                    System.out.println("Order ID: " + inputOrderID);
-                    System.out.println("Product ID: " + productID);
-                    System.out.println("Order Quantity: " + orderQuantity);
-                    System.out.println("Product Price: RM" + String.format("%.2f", productPrice));
+                    System.out.println("\n\nOrder ID	: " + inputOrderID);
+                    System.out.println("Product ID	: " + productID);
+                    System.out.println("Order Quantity	: " + orderQuantity);
+                    System.out.println("Product Price	: RM" + String.format("%.2f", productPrice));
                     totalPrice += productPrice * orderQuantity;
-                    System.out.println("Total Price: RM" + String.format("%.2f", totalPrice));
+                    System.out.println("Total Price	: RM" + String.format("%.2f", totalPrice));
+                    System.out.println("===========================================");
                     if (makePayment(inputOrderID, totalPrice)) {
                     	updateProductQuantity(productID, orderQuantity);
+                    	updateBalance(totalPrice);
                         Transaction transaction = new Transaction(totalPrice);
                    		transaction.saveTransaction();
                     }
@@ -152,9 +155,10 @@ public class Payment {
 
     public boolean makePayment(String orderID, double totalPrice) {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Do you want to make payment on " + orderID + " for a total of RM" + String.format("%.2f", totalPrice) + "?(Y/N): ");
+        System.out.print("Do you want to make payment on " + orderID + " for a total of RM" + String.format("%.2f", totalPrice) + "? (Y/N): ");
         char choice = scanner.next().charAt(0);
         if (choice == 'Y' || choice == 'y') {
+        	System.out.println("\n--------------------------");
             System.out.println("Select Payment Method: ");
             System.out.println("[1] Credit Card");
             System.out.println("[2] TnG");
@@ -176,7 +180,7 @@ public class Payment {
                     System.out.println("Invalid choice. Payment cancelled.");
                     return false;
             }
-            System.out.println("Payment RM" + String.format("%.2f", totalPrice) + " for " + orderID + " has been processed.");
+            System.out.println("Payment price of RM" + String.format("%.2f", totalPrice) + " for " + orderID + " has been processed.");
             updateOrderStatus(orderID);
             return true;
         } else {
@@ -257,13 +261,48 @@ public class Payment {
             e.printStackTrace();
         }
     }
+    
+    public void updateBalance(double totalPrice){
+    	double currentBalance = 0.0, newBalance = 0.0;
+    	try (BufferedReader reader = new BufferedReader(new FileReader(BALANCE_FILE))) {
+    		String line = reader.readLine();
+    		if (line.startsWith("Current Balance: RM")){
+    			String balanceString = line.replace("Current Balance: RM", "").trim();
+            	currentBalance = Double.parseDouble(balanceString);
+    		}
+    	} catch (IOException e){
+    		e.printStackTrace();
+    	}
+    	newBalance = currentBalance - totalPrice;
+    	System.out.println("================================================================");
+    	System.out.println("Balance after payment: \tRM" + String.format("%.2f", newBalance) + "\n\n");
+    	try (BufferedWriter writer = new BufferedWriter(new FileWriter(BALANCE_FILE))) {
+	        writer.write(String.format("Current Balance: RM%.2f", newBalance));
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
+    }
 
 	private void readTransactionRecords() {
+		double totalAmount = 0.0;
         try (BufferedReader reader = new BufferedReader(new FileReader("transactions.txt"))) {
             String line;
+            System.out.printf("%-20s %-40s %-14s \n", "Transaction ID", "Transaction Date", "Transaction Amount");
+        	System.out.println("--------------------------------------------------------------------------------------------------");
             while ((line = reader.readLine()) != null) {
-                System.out.println(line);
+            	String[] transactionDetails = line.split(", ");
+                
+                String transactionID = transactionDetails[0].substring(15);
+                String transactionDate = transactionDetails[1].substring(18);
+                String transactionAmountString = transactionDetails[2].substring(10);
+                double transactionAmount = Double.parseDouble(transactionAmountString);
+                totalAmount += transactionAmount;
+            	if(line.startsWith("Transaction ID: ")){
+            		System.out.printf("%-20s %-40s RM%-14s \n", transactionID, transactionDate, String.format("%.2f",transactionAmount));            	
+            	}
             }
+            System.out.println("--------------------------------------------------------------------------------------------------");
+            System.out.println("Total Transaction Amount: " + String.format("%.2f", totalAmount));
         } catch (IOException e) {
             e.printStackTrace();
         }
