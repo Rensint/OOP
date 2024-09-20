@@ -4,13 +4,13 @@ public class Member {
     private String memberID;
     private String name;
     private String email;
-    private boolean activation;  // Account active?
+    private String phoneNo;
 
-    public Member(String memberID, String name, String email) {
+    public Member(String memberID, String name, String email, String phoneNo) {
         this.memberID = memberID;
         this.name = name;
         this.email = email;
-        this.activation = false; // Default (Inactive)
+        this.phoneNo = phoneNo;
     }
 
     // Getters
@@ -26,56 +26,17 @@ public class Member {
         return email;
     }
 
-    public boolean isActivated() {
-        return activation;
+    public String getPhoneNo() {
+        return phoneNo;
     }
 
-    // Setters
-    public void setMemberID(String memberID) {
-        this.memberID = memberID;
-    }
-
-    public void setName(String name) {
+    // Update profile information
+    public void updateProfile(String name, String phoneNo) {
         this.name = name;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    // Activate account
-    public void activateAccount() {
-        this.activation = true;
-        System.out.println(memberID + ", your account has been activated.");
-    }
-
-    // Update profile
-    public void updateProfile(String name, String email) {
-        if (!activation) {
-            System.out.println("Error: Account is not activated. Please activate your account to update the profile.");
-            return;
-        }
-
-        if (name == null || name.isEmpty() || email == null || email.isEmpty()) {
-            System.out.println("Error: Name or Email cannot be empty.");
-            return;
-        }
-
-        this.name = name;
-        this.email = email;
-        System.out.println("Profile updated successfully.");
-    }
-
-    // Delete account
-    public void deleteAcc() {
-        if (!activation) {
-            System.out.println("Error: Account is not activated. Please activate your account to delete it.");
-            return;
-        }
-        System.out.println("Account with ID " + memberID + " has been deleted.");
+        this.phoneNo = phoneNo;
     }
 
     public String toString() {
-        return "MemberID: " + memberID + ", Name: " + name + ", Email: " + email + ", Activation: " + (activation ? "Activated" : "Not Activated");
+        return "Member ID: " + memberID + ", Name: " + name + ", Email: " + email + ", Phone No: " + phoneNo;
     }
 }
