@@ -1,3 +1,0 @@
-P001, Coffee Beans, High-quality Arabica coffee, 15.50, 100, Beverages
-P002, Tea Leaves, Organic green tea, 12.00, 50, Beverages
-P003, Chocolate Bar, Dark chocolate 70%, 5.00, 200, Snacks
