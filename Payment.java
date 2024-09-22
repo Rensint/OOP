@@ -1,7 +1,7 @@
 import java.io.*;
 import java.util.*;
 
-public class Payment {
+public class Payment extends Transaction{
     private Order order;
     private String paymentMethod;
     private static final String PRODUCT_FILE = "products.txt";
@@ -118,8 +118,7 @@ public class Payment {
                     if (makePayment(inputOrderID, totalPrice)) {
                     	updateProductQuantity(productID, orderQuantity);
                     	updateBalance(totalPrice);
-                        Transaction transaction = new Transaction(totalPrice);
-                   		transaction.saveTransaction();
+                        saveTransaction(totalPrice);
                     }
                 }
             }
@@ -287,22 +286,33 @@ public class Payment {
 		double totalAmount = 0.0;
         try (BufferedReader reader = new BufferedReader(new FileReader("transactions.txt"))) {
             String line;
-            System.out.printf("%-20s %-40s %-14s \n", "Transaction ID", "Transaction Date", "Transaction Amount");
+            System.out.printf("%-20s %-40s %-20s %-20s\n", "Transaction ID", "Transaction Date", "Transaction Amount", "Payment Method");
         	System.out.println("--------------------------------------------------------------------------------------------------");
             while ((line = reader.readLine()) != null) {
             	String[] transactionDetails = line.split(", ");
-                
+                	
                 String transactionID = transactionDetails[0].substring(15);
                 String transactionDate = transactionDetails[1].substring(18);
                 String transactionAmountString = transactionDetails[2].substring(10);
                 double transactionAmount = Double.parseDouble(transactionAmountString);
+                String paymentMethod = transactionDetails[3].substring(16);
                 totalAmount += transactionAmount;
             	if(line.startsWith("Transaction ID: ")){
-            		System.out.printf("%-20s %-40s RM%-14s \n", transactionID, transactionDate, String.format("%.2f",transactionAmount));            	
+            		System.out.printf("%-20s %-40s RM%-20s %-20s\n", transactionID, transactionDate, String.format("%.2f",transactionAmount), paymentMethod);            	
             	}
             }
             System.out.println("--------------------------------------------------------------------------------------------------");
-            System.out.println("Total Transaction Amount: " + String.format("%.2f", totalAmount));
+            System.out.println("Total Transaction Amount: RM" + String.format("%.2f", totalAmount));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void saveTransaction(double totalPrice){
+    	Transaction transaction = new Transaction(totalPrice);
+    	super.saveTransaction(transaction.generateTransactionID(), transaction.getTransactionDate(), totalPrice);
+    	try (BufferedWriter writer = new BufferedWriter(new FileWriter(getTransactionFile(), true))) {
+            writer.write("Payment Method: " + getPaymentMethod() + "\n");
         } catch (IOException e) {
             e.printStackTrace();
         }
