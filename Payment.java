@@ -283,30 +283,37 @@ public class Payment extends Transaction{
     }
 
 	private void readTransactionRecords() {
-		double totalAmount = 0.0;
-        try (BufferedReader reader = new BufferedReader(new FileReader("transactions.txt"))) {
-            String line;
-            System.out.printf("%-20s %-40s %-20s %-20s\n", "Transaction ID", "Transaction Date", "Transaction Amount", "Payment Method");
-        	System.out.println("--------------------------------------------------------------------------------------------------");
-            while ((line = reader.readLine()) != null) {
-            	String[] transactionDetails = line.split(", ");
-                	
-                String transactionID = transactionDetails[0].substring(15);
-                String transactionDate = transactionDetails[1].substring(18);
-                String transactionAmountString = transactionDetails[2].substring(10);
+    double totalAmount = 0.0;
+    try (BufferedReader reader = new BufferedReader(new FileReader("transactions.txt"))) {
+        String line;
+        System.out.printf("%-20s %-40s %-20s %-20s\n", "Transaction ID", "Transaction Date", "Transaction Amount", "Payment Method");
+        System.out.println("--------------------------------------------------------------------------------------------------");
+        while ((line = reader.readLine()) != null) {
+            String[] transactionDetails = line.split(", ");
+            
+            if (transactionDetails.length >= 4) {
+                String transactionID = transactionDetails[0].substring(15).trim();
+                String transactionDate = transactionDetails[1].substring(18).trim();
+                String transactionAmountString = transactionDetails[2].substring(10).trim();
                 double transactionAmount = Double.parseDouble(transactionAmountString);
-                String paymentMethod = transactionDetails[3].substring(16);
+                String paymentMethod = transactionDetails[3].substring(16).trim();
                 totalAmount += transactionAmount;
-            	if(line.startsWith("Transaction ID: ")){
-            		System.out.printf("%-20s %-40s RM%-20s %-20s\n", transactionID, transactionDate, String.format("%.2f",transactionAmount), paymentMethod);            	
-            	}
+
+                System.out.printf("%-20s %-40s RM%-20s %-20s\n", transactionID, transactionDate, String.format("%.2f", transactionAmount), paymentMethod);
+            } else {
+                System.out.println("Malformed line in transactions file: " + line);
             }
-            System.out.println("--------------------------------------------------------------------------------------------------");
-            System.out.println("Total Transaction Amount: RM" + String.format("%.2f", totalAmount));
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+        System.out.println("--------------------------------------------------------------------------------------------------");
+        System.out.println("Total Transaction Amount: RM" + String.format("%.2f", totalAmount));
+        System.out.print（"\n"）;
+        System.out.print（"\n"）;
+        System.out.print（"\n"）;
+    } catch (IOException e) {
+        e.printStackTrace();
     }
+}
+
     
     public void saveTransaction(double totalPrice){
     	Transaction transaction = new Transaction(totalPrice);
@@ -318,5 +325,4 @@ public class Payment extends Transaction{
         }
     }
 }
-
 
