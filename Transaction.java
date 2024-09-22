@@ -1,7 +1,7 @@
 import java.io.*;
 import java.util.*;
 
-public class Transaction {
+public abstract class Transaction {
     private String transactionID;
     private Date transactionDate;
     private double amount;
@@ -22,7 +22,7 @@ public class Transaction {
     }
 
     public Date getTransactionDate() {
-        return transactionDate;
+        return transactionDate = new Date();
     }
 
     public double getAmount() {
@@ -71,16 +71,5 @@ public class Transaction {
 	    return String.format("T%03d", highestID);
 	}
 
-
-
-
-    public void saveTransaction(String transactionID, Date transactionDate, double amount) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(TRANSACTION_FILE, true))) {
-            writer.write("Transaction ID: " + transactionID + ", ");
-            writer.write("Transaction Date: " + transactionDate + ", ");
-            writer.write("Amount: RM" + String.format("%.2f", amount) + ", ");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    public abstract void saveTransaction(double amount);
 }
